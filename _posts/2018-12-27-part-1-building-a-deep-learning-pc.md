@@ -1,7 +1,6 @@
 ---
 layout: post
 title: [Part 1 of 3] Building a Deep Learning PC
-status: draft
 ---
 
 So while I have only recently slowly got into data science and using deep learning libraries. I have been preparing for 

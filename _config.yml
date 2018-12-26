@@ -4,8 +4,8 @@
 permalink:           pretty
 
 # Setup
-title:               codeninja55 Deep Learning Blog
-tagline:             'Blogging my journey into Deep Learning with Computer Vision'
+title:               codeninja55 Deep Learning with Computer Vision Blog
+tagline:             ''
 description:         'A Computer Science and Data Science student wishing to blog his journey into deep learning with computer vision.'
 url:                 https://codeninja55.github.io
 baseurl:             ''

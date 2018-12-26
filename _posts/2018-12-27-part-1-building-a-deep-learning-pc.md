@@ -1,12 +1,15 @@
 ---
 layout: post
-title: What's Jekyll?
+title: [Part 1 of 3] Building a Deep Learning PC
+status: draft
 ---
 
-[Jekyll](http://jekyllrb.com) is a static site generator, an open-source tool for creating simple yet powerful websites of all shapes and sizes. From [the project's readme](https://github.com/mojombo/jekyll/blob/master/README.markdown):
+So while I have only recently slowly got into data science and using deep learning libraries. I have been preparing for 
+this future ever since I started my computer science degree two years ago. And now it has come the time I really 
+(yes, really) needed to get myself some better hardware to move to the next level of my education.
 
-  > Jekyll is a simple, blog aware, static site generator. It takes a template directory [...] and spits out a complete, static website suitable for serving with Apache or your favorite web server. This is also the engine behind GitHub Pages, which you can use to host your project’s page or blog right here from GitHub.
-
-It's an immensely useful tool and one we encourage you to use here with Lanyon.
-
-Find out more by [visiting the project on GitHub](https://github.com/mojombo/jekyll).
+Machine learning and deep learning optimized computers are an expensive endeavour. Trust me, I have looked (if you are 
+curious, this [prebuilt device](https://www.nvidia.com/en-au/data-center/dgx-2/) by nVidia is pretty slick). While my 
+system is worth more than what most people would spend on a PC, I reasoned that I would using this to built some fairly
+large ML models before long and would use it going forward into my academic research career. So I was more than willing
+to add some serious juice. 

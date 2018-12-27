@@ -1,42 +1,58 @@
 ---
 layout: post
-title: Part 1 of 3 - Building a Deep Learning PC
+title: Part 1 of 3: Building a Deep Learning PC
 ---
 
 So while I have only recently slowly got into data science and using deep learning libraries. I have been preparing for 
 this future ever since I started my computer science degree two years ago. And now it has come the time I really 
 (yes, really) needed to get myself some better hardware to move to the next level of my education.
 
+While there are some people out there who believe using a cloud solution was always going to be better than outlaying
+ the capital cost for your own local system. I however, believe that over time, building and managing your own system
+  can be beneficial for both understanding deep learning and the environments required to develop them in. 
+  Additionally, the new NVIDIA Turing architecture GeForce 2080 Ti GPU is also a great one for use with gaming. I 
+  am also lucky to be be a research assistant at the University of Wollongong developing large-scale big data 
+  applications with Spark. For this, I needed my own system at home that I could use as a master node to control any 
+  additional distributed systems I can build.
+
 Machine learning and deep learning optimized computers are an expensive endeavour. Trust me, I have looked (if you are 
 curious, this [prebuilt device](https://www.nvidia.com/en-au/data-center/dgx-2/) by nVidia is pretty slick). While my 
 system is worth more than what most people would spend on a PC, I reasoned that I would using this to build some fairly
 large ML models before long and would use it going forward into my academic research career. So I was more than willing
-to add some serious juice. 
+to add some serious juice. If you would like to read more about the best components for your own Deep Learning PC, I 
+highly recommending reading this [post](http://timdettmers.com/2018/12/16/deep-learning-hardware-guide/) by Tim 
+Dettmers which I found to be really beneficial when I was planning my build.  
 
 This is a post series as a reminder to myself as much as to help those who are considering building and setting up a 
 similar system. Any comments or suggestions would be welcome as I am still a student learning about how to best 
 configure these systems. 
 
-This is a three part series that I will endeavour to update regularly as I discover better workflows.
+This is a three part series that I will endeavour to update regularly as I discover better workflows. Addtionally, 
+there will be an optional fourth part discussing about how to use the GPU without attaching the screen to it. 
 1. Part 1 (this post): Hardware Drivers and System OS Installation.
-2. Part 2: Development Environment and Library Installation
-3. Part 3: Configuring Remote Access and Testing your new Development Environment 
+2. Part 2: Development Environment, Frameworks, and IDE Installation.
+3. Part 3: Configuring Remote Access and Testing your new Development Environment.
+4. Part 4 (Optional): Using GPU on Linux without OpenGL and Xorg
 
 ## Hardware and System OS Installation
 #### Hardware Configurations
 ```
-CPU: Intel Core i9 9900K
-Motherboard: Asus ROG Maximus XI Extreme
+CPU: Intel Core i9 9900K LGA1151 3.6GHz (5GHz Turbo) 8 Cores, 16 Thread Unlocked 
+Motherboard: Asus ROG Maximus XI Extreme*
 Memory: 32GB DIMM DDR4 3200MHZ
-Hard Drive: 2x Samsung 970 Pro 521GB V-NAND NVMe M.2 SSD*
-Additional Persistent Storage: 6x Samsung 860 Pro 1TB V-NAND SATA SSD in Raid 0 with Intel Rapid Storage**
-Onboard GPU: Intel UHD Graphics support
-Additional GPU: 2x Asus GeForce RTX 2080 Ti Dual with nVidia NVLink
+PSU: Asus ROG Thor 1200W 80+ Platinum
+Hard Drive: 2x Samsung 970 Pro 521GB V-NAND NVMe M.2 SSD**
+Additional Persistent Storage: 6x Samsung 860 Pro 1TB V-NAND SATA SSD in Raid 0 with Intel Rapid Storage***
+Onboard GPU: Intel UHD Graphics 630 
+Additional GPU: 2x Asus GeForce RTX 2080 Ti Dual with NVIDIA NVLink
 ```
-\* Windows 10 was installed in one SSD to allow easier configurations of BIOS with utilities provided by Asus.
+\* The Asus AI Overclocking feature of this motherboard allows me to run my CPU at a consistent 4.8GHZ without too 
+much crazy cooling required. You will need some sort of AIO or custom water cooling to achieve something similar. 
 
-** There is still some considerations to use Intel Optane Memory Raid however, there are some concerns with PCI-e lanes 
-with adding too many devices in addition to running dual GPU (will update further). 
+** Windows 10 was installed in one SSD to allow easier configurations of BIOS with utilities provided by Asus.
+
+*** There is still some considerations to use Intel Optane Memory Raid however, there are some concerns with PCI-e 
+lanes with adding too many devices in addition to running dual GPU (will update further). 
 
 #### System Configurations
 ```
@@ -59,8 +75,8 @@ bootable USB with [Win32DiskImager](https://sourceforge.net/projects/win32diskim
 
 ### Installing Ubuntu
 When installing Ubuntu, ensure you are installing the full version and not the minimal version. I have had troubles with
-these configurations in the past. Also ensure you are installing Ubuntu 18.04 on the SSD that is empty, not the one that 
-you used to install Windows 10. Usually this will be either `nvme0n1` or `nvme1n1`.
+these configurations in the past using minimal install. Also ensure you are installing Ubuntu 18.04 on the SSD that is 
+empty, not the one that you used to install Windows 10. Usually this will be either `nvme0n1` or `nvme1n1`.
 
 Additionally, I prefer to encrypt my Ubuntu OS whenever I use it so I also selected 'LVM' and 'Encryption'.
 
@@ -72,11 +88,9 @@ $ sudo apt update && sudo apt dist-upgrade
 ```
 
 Additionally, we will be using the latest kernel available to ensure the best support for the hardware of the PC. The 
-Ubuntu 18.04 package install comes prepackaged with kernel 4.13, however, the latest at the time of writing was 4.20. 
+Ubuntu 18.04.1 install comes prepackaged with kernel 4.13, however, the latest at the time of writing was 4.20.x. 
 To install this, we will using a third-party package called [ukuu](https://github.com/teejee2008/ukuu) to upgrade to the 
 latest.
-
- 
 
 ## Setting up the Ubuntu 18.04 for Hardware Compatibility
 At this stage, we want to set up the Ubuntu to ensure all packages required for deep learning and GPU support will be 
@@ -109,9 +123,10 @@ $ sudo apt install -y git-lfs
 ```
 
 ## Jetbrains Toolbox and IDE
-One of my favourite IDE to use during development it Jetbrain's various development editors - particularly PyCharm and 
+One of my favourite IDE to use during development it JetBrain's various development editors - particularly PyCharm and 
 IntelliJ IDEA. To easily install as many of them as possible, Jetbrains provides a 
-[Toolbox application](https://www.jetbrains.com/toolbox/app/) you can use to easily install each individual IDE. To install the Toolbox app, create a script and use it to install.
+[Toolbox application](https://www.jetbrains.com/toolbox/app/) you can use to easily install each individual IDE. To 
+install the Toolbox app, create a script and use it to install.
 
 ```bash
 $ touch jetbrains-toolbox.sh
@@ -122,6 +137,8 @@ $ nano jetbrains-toolbox.sh
 
 #### `jetbrains-toolbox.sh`
 ```shell
+#!/bin/bash
+
 function getLatestUrl() {
   USER_AGENT=('User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36')
 
@@ -154,6 +171,7 @@ chmod -R +rwx /usr/local/bin/jetbrains-toolbox
 rm ${DEST}
 ```
 
+Back at the terminal to install and run for the first time.
 ```bash
 $ sudo chmod +x jetbrains-toolbox.sh
 $ sudo ./jetbrains-toolbox.sh
@@ -161,15 +179,15 @@ $ jetbrains-toolbox
 ```
 * After you run `jetbrains-toolbox` for the first time, a desktop application shortcut will be added which you can 
 use next time to run the tool.
-* Make sure you install PyCharm Community or Professional after this by signing into your Jetbrains account and going
+* Make sure you install PyCharm Community or Professional after this by signing into your JetBrains account and going
  to _Tools_ and pressing _Install_ for the PyCharm Professional or Community.
 
-![JetBrains Toolbox App](/_images/2018-12-27-jetbrains_toolbox.PNG)
+![JetBrains Toolbox App](_images/2018-12-27-jetbrains_toolbox.PNG)
 
-## Installing nVidia GPU drivers
+## Installing NVIDIA GPU drivers
 Some of the deep learning libraries we will be installing later will use the GPU and CUDA to allow better processing of 
-machine learning computations. To ensure they work properly, you must install the correct drivers for your GPU. In my 
-case, the following will work.
+machine learning computations. To ensure they work properly, you must install the correct proprietary drivers for your
+ GPU. In my case, the following will work.
 
 ### (1)
 Check that your GPU is visible to the kernel via the PCI-e lanes:
@@ -217,9 +235,9 @@ $ sudo apt install -y gcc build-essential
 ```
 
 ### (2)
-Next, Ubuntu comes with a default open-source driver for GPU called 'nouveau'. Allowing this driver to continue to 
-work will stop the nVidia drivers from working. To blacklist this during boot up, create the following configuration 
-file in `/etc/modprobe.d/blacklist-nouveau.conf`.
+Next, Ubuntu comes with a default open-source driver for GPU called 'nouveau'. Allowing this driver to be loaded will 
+interfere with the NVIDIA drivers. To blacklist this during boot up, create the following configuration file in 
+`/etc/modprobe.d/blacklist-nouveau.conf`. 
 ```bash
 $ sudo touch /etc/modprobe.d/blacklist-nouveau.conf
 $ sudo nano /etc/modprobe.d/blacklist-nouveau.conf
@@ -234,7 +252,8 @@ alias nouveau off
 alias lbm-nouveau off
 ```
 
-After creating the above conf file, ensure you update boot up process by running these commands and then rebooting.
+After creating the above conf file, ensure you update the systemd boot up process by running these commands and then 
+rebooting.
 
 ```bash
 $ sudo echo "options nouveau modeset=0" | sudo tee -a /etc/modprobe.d/nouveau-kms.conf
@@ -246,8 +265,8 @@ $ sudo reboot
 [IMPORTANT !!!] After you have rebooted back to Ubuntu, ensure you follow these steps carefully.
 
 ### (3) 
-Before you login to the `gdm3` X Window System, press _Ctl + Alt + F2_ to use the virtual console `ttyn2`. Login 
-through the ttyn terminal:
+Before you login to the Ubuntu X Window System, press _Ctl + Alt + F2_ to use the virtual console `ttyn2`. Login 
+through the ttyn terminal as below:
   ```bash
   Ubuntu 18.04 CN55-GENIE-Ubuntu tty2
   CN55-GENIE-Ubuntu login: codeninja
@@ -261,7 +280,7 @@ Check that you have blacklisted 'nouveau' properly by running:
   $ lsmod | grep -i nouveau
   ```
 
-You should see nothing be returned.
+You should see nothing returned.
 
 ### (5)
 We need to stop the display manager and drop to run level 3 next.
@@ -276,7 +295,7 @@ We need to stop the display manager and drop to run level 3 next.
   \* Ensure that the `[ - ]` is showing for `gdm3` which means you have stopped the service properly.
 
 ### (6) 
-We are going to use a PPA which will allow us to use the latest nVidia proprietary drivers.
+We are going to use a PPA which will allow us to use the latest NVIDIA proprietary drivers.
   ```bash
   $ sudo add-apt-repository ppa:graphics-drivers/ppa
   $ sudo apt update
@@ -298,7 +317,7 @@ Before we install the driver, we will use Ubuntu to find out what is the recomme
 * You could also just install the driver using `sudo ubuntu-drivers autoinstall` which would install the recommended 
 driver. 
 
-Finally, we will install the nVidia driver and an additional utility called `nvidia-modprobe`. 
+Finally, we will install the NVIDIA driver and an additional utility called `nvidia-modprobe`. 
   ```bash
   $ sudo apt install -y nvidia-driver-415 nvidia-modprobe
   $ sudo reboot
@@ -334,32 +353,30 @@ $ nvidia-smi
 
 ## Installing CUDA Toolkit and cuDNN
 
-When working with Deep Learning and GPU's, inevitably, you will need a utility framework provided by nVidia called 
-[NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1804&target_type=runfilelocal) which provides a development environment for creating high performance GPU-accelerated 
-applications. 
+When working with Deep Learning and GPU's, inevitably, you will need a utility framework provided by NVIDIA called 
+[NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1804&target_type=runfilelocal) which provides a development environment for creating high performance GPU-accelerated applications.  
 
 CUDA is a tool written mostly in C++ and to use it, you will generally be writing in the same language. However, 
-Python libraries such as tensorflow and pytorch have provided a wrapping Application Programming Interface (API) 
-where you can still use CUDA tensors and optimized operations to perform incredibly fast deep learning programming.
+Python libraries such as TensorFlow, Keras, and PyTorch have provided a wrapper Application Programming Interface 
+(API) where you can still use CUDA tensors and optimized operations to perform incredibly fast deep learning programming.
 
-To install CUDA, you can either follow the thorough [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia
-.com/cuda/cuda-installation-guide-linux/index.html) or just follow the steps below.
+To install CUDA, you can either go to the thorough [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) or just follow the steps below.
 
 ### (1) Downloading CUDA Installation Runfile
 The first step we need to do is download the installation run file from this 
 [site](https://developer.nvidia.com/cuda-downloads). From here, select the appropriate options as per below:
 
-![NVIDIA CUDA Download page](/_images/2018-12-27-cuda_download.png)
+![NVIDIA CUDA Download page](_images/2018-12-27-cuda_download.png)
 
-Download the file by clicking the __Download (2.0 GB)__ button. Ensure you download it to `/home/<username>/Downloads`.
+Download the file by clicking the _Download (2.0 GB)_ button. Ensure you download it to `/home/<username>/Downloads`.
 
-We will be using the run file to avoid installing the nVidia driver again as part of this process.
+We will be using the run file to avoid installing the NVIDIA driver again as part of this process.
 
 ### (2) Installing CUDA from the runfile.
 
 From here, we will need to logout of `gdm3` again and repeat step (3) from when we installed the nVidia driver.
 
-Press _Ctl + Alt + F2_ to use the virtual console `ttyn2`. Login through the `ttyn` terminal:
+Press _Ctl + Alt + F2_ to use the virtual console `ttyn2` and login:
   ```bash
   Ubuntu 18.04 CN55-GENIE-Ubuntu tty2
   CN55-GENIE-Ubuntu login: codeninja
@@ -468,3 +485,49 @@ Result = PASS
 
 If you have correctly installed CUDA and setup the environment variables, running the above will give you a similar 
 output. 
+
+### (5) Installing cuDNN
+
+The NVIDIA CUDA Depp Neural Network library (cuDNN) is a GPU-accelerated library that provides implementations of 
+standard routines such as forward and backward convolution, pooling, normalization, and activation layers. It is 
+often implemented as part of many deep learning frameworks such as Keras, MxNet, TensorFlow, and PyTorch. 
+
+To download cuDNN, you must sign in or create an NVIDIA Developer account. Then go to this 
+[link](https://developer.nvidia.com/rdp/cudnn-download) and select _Download cuDNN v7.45.2 (Dec 14, 2018), for CUDA 
+10.0_ and then _cuDNN Library for Linux_. Download this to your `$HOME/Downloads/` directory.
+
+![cuDNN Downloads Page](_images/2018-12-27-cudnn_download.png)
+
+The installation guide provided by NVIDIA can also be found 
+[here](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html).
+
+```bash
+$ cd $HOME/Downloads/
+$ tar -xvf cudnn-10.0-linux-x64-v7.4.2.24.tgz
+```
+
+This compressed directory includes the following important headers which you can see from the following output.
+
+```bash
+$ ls cuda/lib64/
+
+libcudnn.so  libcudnn.so.7  libcudnn.so.7.4.2  libcudnn_static.a
+
+$ ls cuda/include/
+
+cudnn.h
+```
+
+To ensure the library works, all you need to do is copy these files to your CUDA directory.
+
+```bash
+$ sudo cp cuda/include/cudnn.h /usr/local/cuda/include/
+$ sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64/
+$ sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
+```
+* Ensure that `usr/local/cuda` is symlinked correctly to your CUDA installation directory which was originally 
+installed at `/usr/local/cuda-10.0`.
+
+That's all for this part of the series. Next up will be Part 2: Development Environment, Frameworks, and IDE 
+Installation which will look at setting up your Anaconda Virtual Environment, Jupyter Lab (optional), PyCharm IDE 
+(optional), and installing Keras, TensorFlow, PyTorch, and MxNet.

@@ -4,13 +4,19 @@
 permalink:           pretty
 
 # Setup
-title:               Musings of a Data Scientiest
+title:               Musings of a Data Scientist
 tagline:             ''
 description:         'A Computer Science and Data Science student wishing to blog his journey into deep learning with
  computer vision and big data.'
 url:                 https://codeninja55.github.io
 baseurl:             ''
 paginate:            5
+
+social:
+  github:            codeninja55
+  linkedin:          andrew-che-1194144b
+  twitter:           codeninja55
+  bitbucket:         codeninja55
 
 # About/contact
 author:

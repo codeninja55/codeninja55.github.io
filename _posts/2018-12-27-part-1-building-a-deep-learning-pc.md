@@ -27,12 +27,14 @@ This is a post series as a reminder to myself as much as to help those who are c
 similar system. Any comments or suggestions would be welcome as I am still a student learning about how to best 
 configure these systems. 
 
-This is a three part series that I will endeavour to update regularly as I discover better workflows. Addtionally, 
-there will be an optional fourth part discussing about how to use the GPU without attaching the screen to it. 
+This is a three part series that I will endeavour to update regularly as I discover better workflows. Additionally, 
+there will be an optional fourth and fifth part discussing about how to use the GPU without attaching the screen to 
+it and running Windows 10 from within Linux using a raw disk. 
 1. Part 1 (this post): Hardware Drivers and System OS Installation.
 2. Part 2: Development Environment, Frameworks, and IDE Installation.
 3. Part 3: Configuring Remote Access and Testing your new Development Environment.
 4. Part 4 (Optional): Using GPU on Linux without OpenGL and Xorg
+5. Part 5 (Optional): Windows Raw Disk Virtual Machine
 
 ## Hardware and System OS Installation
 #### Hardware Configurations

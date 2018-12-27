@@ -13,10 +13,10 @@ baseurl:             ''
 paginate:            5
 
 social:
-github:            codeninja55
-linkedin:          andrew-che-1194144b
-twitter:           codeninja55
-bitbucket:         codeninja55
+github:              codeninja55
+linkedin:            andrew-che-1194144b
+twitter:             codeninja55
+bitbucket:           codeninja55
 
 # About/contact
 author:

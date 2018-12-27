@@ -184,7 +184,7 @@ use next time to run the tool.
 * Make sure you install PyCharm Community or Professional after this by signing into your JetBrains account and going
  to _Tools_ and pressing _Install_ for the PyCharm Professional or Community.
 
-![JetBrains Toolbox App](_images/2018-12-27-jetbrains_toolbox.PNG)
+![JetBrains Toolbox App](/images/2018-12-27-jetbrains_toolbox.PNG)
 
 ## Installing NVIDIA GPU drivers
 Some of the deep learning libraries we will be installing later will use the GPU and CUDA to allow better processing of 
@@ -368,7 +368,7 @@ To install CUDA, you can either go to the thorough [NVIDIA CUDA Installation Gui
 The first step we need to do is download the installation run file from this 
 [site](https://developer.nvidia.com/cuda-downloads). From here, select the appropriate options as per below:
 
-![NVIDIA CUDA Download page](_images/2018-12-27-cuda_download.png)
+![NVIDIA CUDA Download page](/images/2018-12-27-cuda_download.png)
 
 Download the file by clicking the _Download (2.0 GB)_ button. Ensure you download it to `/home/<username>/Downloads`.
 
@@ -498,7 +498,7 @@ To download cuDNN, you must sign in or create an NVIDIA Developer account. Then 
 [link](https://developer.nvidia.com/rdp/cudnn-download) and select _Download cuDNN v7.45.2 (Dec 14, 2018), for CUDA 
 10.0_ and then _cuDNN Library for Linux_. Download this to your `$HOME/Downloads/` directory.
 
-![cuDNN Downloads Page](_images/2018-12-27-cudnn_download.png)
+![cuDNN Downloads Page](/images/2018-12-27-cudnn_download.png)
 
 The installation guide provided by NVIDIA can also be found 
 [here](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html).

@@ -4,9 +4,10 @@
 permalink:           pretty
 
 # Setup
-title:               Deep Learning with Computer Vision Blog
+title:               Musings of a Data Scientiest
 tagline:             ''
-description:         'A Computer Science and Data Science student wishing to blog his journey into deep learning with computer vision.'
+description:         'A Computer Science and Data Science student wishing to blog his journey into deep learning with
+ computer vision and big data.'
 url:                 https://codeninja55.github.io
 baseurl:             ''
 paginate:            5

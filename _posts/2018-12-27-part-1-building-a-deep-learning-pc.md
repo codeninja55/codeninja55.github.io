@@ -31,7 +31,7 @@ configure these systems.
 This is a three part series that I will endeavour to update regularly as I discover better workflows. Additionally, 
 there will be an optional fourth and fifth part discussing about how to use the GPU without attaching the screen to 
 it and running Windows 10 from within Linux using a raw disk. 
-1. Part 1 (this post): Hardware Drivers and System OS Installation.
+1. Part 1 (this post): [Hardware Drivers and System OS Installation](/_posts/2018-12-27-part-1-building-a-deep-learning-pc.md).
 2. Part 2: Development Environment, Frameworks, and IDE Installation.
 3. Part 3: Configuring Remote Access and Testing your new Development Environment.
 4. Part 4 (Optional): Using GPU on Linux without OpenGL and Xorg
@@ -59,12 +59,12 @@ lanes with adding too many devices in addition to running dual GPU (will update 
 
 #### System Configurations
 ```
-Linux Kernel: 4.20.0-042000-generic*
+Linux Kernel: 4.18.0-14-generic*
 OS Version: Ubuntu 18.04.1 LTS Bionic
 GPU Driver: nvidia-driver-415*
 CUDA Version: CUDA 10.0*
 ```
-\* These are the latest versions as of this post 2018-12-27.
+\* These are the latest versions in the Ubuntu repository as of this post 2019-02-09.
 
 ### Pre-Installation System Settings
 * Use F8 to enter one-time boot menu 
@@ -91,19 +91,21 @@ $ sudo apt update && sudo apt dist-upgrade
 ```
 
 Additionally, we will be using the latest kernel available to ensure the best support for the hardware of the PC. The 
-Ubuntu 18.04.1 install comes prepackaged with kernel 4.13, however, the latest at the time of writing was 4.20.x. 
-To install this, we will using a third-party package called [ukuu](https://github.com/teejee2008/ukuu) to upgrade to the 
-latest.
+Ubuntu 18.04.1 install comes prepackaged with kernel 4.15, however, the latest at the time of writing was 4.18.x in 
+the Ubuntu repository. 
+To install this, we will manually install via `apt`.
 
 ## Setting up the Ubuntu 18.04 for Hardware Compatibility
 At this stage, we want to set up the Ubuntu to ensure all packages required for deep learning and GPU support will be 
 ready. To do this, we will also be installing some additional useful packages.
 
 ```bash
-$ sudo apt-add-repository -y ppa:teejee2008/ppa
 $ sudo apt update
-$ sudo apt install -y ukuu
-$ ukuu --install --yes v4.20
+$ sudo apt install linux-headers-4.18.0-15 \ 
+  linux-headers-4.18.0-15-generic \ 
+  linux-image-4.18.0-15-generic \
+  linux-modules-4.18.0-15-generic \
+$ sudo reboot
 ```
 
 ### Git and Git LFS
@@ -115,7 +117,7 @@ $ git config --global user.name "your-user-name"
 $ git config --global user.email "your-github-email"
 ```
 
-To install Git LFS, you will need to copy these commands:
+To install Git LFS, you will need to follow these commands:
 ```bash
 $ sudo apt install -y gnupg apt-transport-https
 $ curl -L https://packagecloud.io/github/git-lfs/gpgkey | sudo apt-key add -
@@ -135,7 +137,7 @@ install the Toolbox app, create a script and use it to install.
 $ touch jetbrains-toolbox.sh
 $ nano jetbrains-toolbox.sh
 ```
-* Create a shell script as believe using any editor.
+* Create a shell script as below using any editor.
 * In this example, I have used the `nano` editor and then copied from below and used _Ctrl + Alt + V_ to paste.
 
 #### `jetbrains-toolbox.sh`
@@ -234,7 +236,11 @@ $ sudo lshw -numeric -C display
 
 You will need to install some additional Linux packages for later so do them now.
 ```bash
-$ sudo apt install -y gcc build-essential
+$ sudo apt update
+$ sudo apt install -y gcc gcc-6 g++-6 build-essential cmake unzip pkg-config libxmu-dev libxi-dev \ 
+  libglu1-mesa libglu1-mesa-dev libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev \ 
+  libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libgtk-3-dev libopenblas-dev libatlas-base-dev \ 
+  liblapack-dev gfortran libhdf5-serial-dev python3-dev python3-tk python-imaging-tk ubuntu-restricted-extras
 ```
 
 ### (2)
@@ -268,11 +274,11 @@ $ sudo reboot
 [IMPORTANT !!!] After you have rebooted back to Ubuntu, ensure you follow these steps carefully.
 
 ### (3) 
-Before you login to the Ubuntu X Window System, press _Ctl + Alt + F2_ to use the virtual console `ttyn2`. Login 
-through the ttyn terminal as below:
+Before you login to the Ubuntu X Window System, press _Ctl + Alt + F3_ to use the virtual console `tty3`. Login 
+through the TTY subsystem as below:
   ```bash
-  Ubuntu 18.04 CN55-GENIE-Ubuntu tty2
-  CN55-GENIE-Ubuntu login: codeninja
+  Ubuntu 18.04 SYSTEM-HOSTNAME tty3
+  XXXX login: your-user-login
   Password: ********
   $
   ```
@@ -379,10 +385,10 @@ We will be using the run file to avoid installing the NVIDIA driver again as par
 
 From here, we will need to logout of `gdm3` again and repeat step (3) from when we installed the nVidia driver.
 
-Press _Ctl + Alt + F2_ to use the virtual console `ttyn2` and login:
+Press _Ctl + Alt + F3_ to use the virtual console `ttyn2` and login:
   ```bash
-  Ubuntu 18.04 CN55-GENIE-Ubuntu tty2
-  CN55-GENIE-Ubuntu login: codeninja
+  Ubuntu 18.04 SYSTEM-HOSTNAME tty3
+  SYSTEM-HOSTNAME login: your-user-login
   Password: ********
   $ sudo service gdm3 stop 
   $ sudo service --status-all | grep -i gdm3
@@ -398,7 +404,7 @@ not need to follow any prompts.
 ```bash
 $ cd $HOME/Downloads/
 $ sudo ./cuda_10.0.130_410.48_linux.run --silent --toolkit --toolkitpath=/usr/local/cuda-10.0/ --samples
-$ sudo ln -s /usr/local/cuda /usr/local/cuda-10.0
+$ sudo ln -s /usr/local/cuda-10.0 /usr/local/cuda
 ```
 * The last line just adds a symbolic link to the CUDA installation path to allow you to install a newer version at a 
 later date.
@@ -436,6 +442,13 @@ Now that we have installed and setup environment variables for CUDA, we will tes
  the samples that were installed with CUDA. Follow the following steps.
  
 ```bash
+$ nvcc -V
+
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2018 NVIDIA Corporation
+Built on Sat_Aug_25_21:08:01_CDT_2018
+Cuda compilation tools, release 10.0, V10.0.130
+
 $ cd $HOME/NVIDIA_CUDA-10.0_Samples
 $ make -j4
 $ deviceQuery

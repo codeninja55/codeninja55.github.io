@@ -5,9 +5,11 @@ status: draft
 ---
 
 This is a three part series that I will endeavour to update regularly as I discover better workflows.
-1. Part 1 (this post): Hardware Drivers and System OS Installation.
-2. Part 2: Development Environment and Library Installation
-3. Part 3: Configuring Remote Access and Testing your new Development Environment 
+1. Part 1: Hardware Drivers and System OS Installation.
+2. Part 2 (this post): [Development Environment, Frameworks, and IDE Installation](/_posts/2018-12-28-part-2-building-a-deep-learning-pc.md).
+3. Part 3: Configuring Remote Access and Testing your new Development Environment.
+4. Part 4 (Optional): Using GPU on Linux without OpenGL and Xorg
+5. Part 5 (Optional): Windows Raw Disk Virtual Machine
 
 ## Hardware and System OS Installation
 Just a reminder these are the hardware and software configurations I have been using as part of this series.

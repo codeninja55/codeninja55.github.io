@@ -31,7 +31,7 @@ configure these systems.
 This is a three part series that I will endeavour to update regularly as I discover better workflows. Additionally, 
 there will be an optional fourth and fifth part discussing about how to use the GPU without attaching the screen to 
 it and running Windows 10 from within Linux using a raw disk. 
-1. Part 1 (this post): [Hardware Drivers and System OS Installation](/_posts/2018-12-27-part-1-building-a-deep-learning-pc.md).
+1. Part 1 (this post): [Hardware Drivers and System OS Installation](2018-12-27-part-1-building-a-deep-learning-pc.md).
 2. Part 2: Development Environment, Frameworks, and IDE Installation.
 3. Part 3: Configuring Remote Access and Testing your new Development Environment.
 4. Part 4 (Optional): Using GPU on Linux without OpenGL and Xorg
@@ -70,7 +70,7 @@ CUDA Version: CUDA 10.0*
 * Use F8 to enter one-time boot menu 
 * Install Windows 10 to use the Asus EZUpdate provided utility for quick BIOS updates.
 * Press F2 when you see the Republic of Gamers logo to enter BIOS settings.
-* Ensure `Secure Boot` is set to Windows UEFI.
+* Ensure `Secure Boot` is set to **Other OS** to turn off Secure Boot otherwise Nvidia drivers won't work.
 * Disable `Fast Boot`
 * Download from [here](http://releases.ubuntu.com/18.04/) or directly from 
 [ubuntu-18.04.1-desktop-amd64.iso](http://releases.ubuntu.com/18.04/ubuntu-18.04.1-desktop-amd64.iso) and create a 
@@ -238,8 +238,9 @@ You will need to install some additional Linux packages for later so do them now
 ```bash
 $ sudo apt update
 $ sudo apt install -y gcc gcc-6 g++-6 build-essential cmake unzip pkg-config libxmu-dev libxi-dev \ 
-  libglu1-mesa libglu1-mesa-dev libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev \ 
-  libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libgtk-3-dev libopenblas-dev libatlas-base-dev \ 
+  freeglut3-dev libx11-dev libfreeimage3 libfreeimage3-dev libglu1-mesa libglu1-mesa-dev \
+  libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
+  libxvidcore-dev libx264-dev libgtk-3-dev libopenblas-dev libatlas-base-dev \ 
   liblapack-dev gfortran libhdf5-serial-dev python3-dev python3-tk python-imaging-tk ubuntu-restricted-extras
 ```
 
@@ -427,10 +428,12 @@ system. You can do this by adding these to your `$HOME/.bashrc` profile file.
 ```bash
 $ echo '' >> $HOME/.bashrc 
 $ echo '##### CUDA INSTALLATION VARIABLES #####' >> $HOME/.bashrc
-$ echo 'export CUDA=/usr/local/cuda/bin' >> $HOME/.bashrc 
+$ echo 'export CUDA_HOME=/usr/local/cuda' >> $HOME/.bashrc 
+$ echo 'export CUPTI=/usr/local/cuda/extras/CUPTI/lib64' >> $HOME/.bashrc
+$ echo 'export CUDA_LD=/usr/local/cuda/lib64' >> $HOME/.bashrc
 $ echo 'export CUDA_SAMPLES=$HOME/NVIDIA_CUDA-10.0_Samples/bin/x86_64/linux/release' >> $HOME/.bashrc 
-$ echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> $HOME/.bashrc 
-$ echo 'export PATH=$CUDA:$CUDA_SAMPLES:$PATH' >> $HOME/.bashrc 
+$ echo 'export LD_LIBRARY_PATH=$CUDA_LD:$CUPTI:$LD_LIBRARY_PATH' >> $HOME/.bashrc 
+$ echo 'export PATH=$CUDA/bin:$CUDA_SAMPLES:$PATH' >> $HOME/.bashrc 
 $ source $HOME/.bashrc 
 ```
 * I added the CUDA Samples variable also so you can easily run some of the samples later. After testing, you can 
@@ -510,7 +513,8 @@ often implemented as part of many deep learning frameworks such as Keras, MxNet,
 
 To download cuDNN, you must sign in or create an NVIDIA Developer account. Then go to this 
 [link](https://developer.nvidia.com/rdp/cudnn-download) and select _Download cuDNN v7.45.2 (Dec 14, 2018), for CUDA 
-10.0_ and then _cuDNN Library for Linux_. Download this to your `$HOME/Downloads/` directory.
+10.0_ and then _cuDNN Library for Linux_. Also, make sure you download _cuDNN Code Samples and User Guide for 
+Ubuntu18.04 (Deb)_ Download this to your `$HOME/Downloads/` directory.
 
 ![cuDNN Downloads Page](/images/2018-12-27-cudnn_download.png)
 
@@ -544,6 +548,77 @@ $ sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
 * Ensure that `usr/local/cuda` is symlinked correctly to your CUDA installation directory which was originally 
 installed at `/usr/local/cuda-10.0`.
 
+### Testing cuDNN Samples
+At this point, you should have the cuDNN library installed. To test if the library works properly, we will use the 
+code samples provided in the `deb` file, extract it, compile it, and then run it. You should be currently in your 
+`$HOME/Downloads` directory if that's where you downloaded the samples.
+
+```bash
+$ dpkg -x libcudnn7-doc_7.4.1.5-1+cuda10.0_amd64.deb $HOME/Downloads/
+$ mv /usr/src/cudnn_samples_v7 $HOME/Downloads/ && rm -rf src/
+$ cd cudnn_samples_v7/mnistCUDNN
+$ make clean && make
+$ ./mnistCUDNN
+
+cudnnGetVersion() : 7402 , CUDNN_VERSION from cudnn.h : 7402 (7.4.2)
+Host compiler version : GCC 6.5.0
+There are 1 CUDA capable devices on your machine :
+device 0 : sms 68  Capabilities 7.5, SmClock 1560.0 Mhz, MemSize (Mb) 10989, MemClock 7000.0 Mhz, Ecc=0, boardGroupID=0
+Using device 0
+
+Testing single precision
+Loading image data/one_28x28.pgm
+Performing forward propagation ...
+Testing cudnnGetConvolutionForwardAlgorithm ...
+Fastest algorithm is Algo 0
+Testing cudnnFindConvolutionForwardAlgorithm ...
+^^^^ CUDNN_STATUS_SUCCESS for Algo 0: 0.016416 time requiring 0 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 1: 0.040928 time requiring 3464 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 2: 0.043040 time requiring 57600 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 7: 0.049152 time requiring 2057744 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 4: 0.057248 time requiring 207360 memory
+Resulting weights from Softmax:
+0.0000000 0.9999399 0.0000000 0.0000000 0.0000561 0.0000000 0.0000012 0.0000017 0.0000010 0.0000000 
+Loading image data/three_28x28.pgm
+Performing forward propagation ...
+Resulting weights from Softmax:
+0.0000000 0.0000000 0.0000000 0.9999288 0.0000000 0.0000711 0.0000000 0.0000000 0.0000000 0.0000000 
+Loading image data/five_28x28.pgm
+Performing forward propagation ...
+Resulting weights from Softmax:
+0.0000000 0.0000008 0.0000000 0.0000002 0.0000000 0.9999820 0.0000154 0.0000000 0.0000012 0.0000006 
+
+Result of classification: 1 3 5
+
+Test passed!
+
+Testing half precision (math in single precision)
+Loading image data/one_28x28.pgm
+Performing forward propagation ...
+Testing cudnnGetConvolutionForwardAlgorithm ...
+Fastest algorithm is Algo 0
+Testing cudnnFindConvolutionForwardAlgorithm ...
+^^^^ CUDNN_STATUS_SUCCESS for Algo 0: 0.016896 time requiring 0 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 2: 0.028736 time requiring 28800 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 1: 0.028992 time requiring 3464 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 7: 0.047456 time requiring 2057744 memory
+^^^^ CUDNN_STATUS_SUCCESS for Algo 4: 0.049824 time requiring 207360 memory
+Resulting weights from Softmax:
+0.0000001 1.0000000 0.0000001 0.0000000 0.0000563 0.0000001 0.0000012 0.0000017 0.0000010 0.0000001 
+Loading image data/three_28x28.pgm
+Performing forward propagation ...
+Resulting weights from Softmax:
+0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000714 0.0000000 0.0000000 0.0000000 0.0000000 
+Loading image data/five_28x28.pgm
+Performing forward propagation ...
+Resulting weights from Softmax:
+0.0000000 0.0000008 0.0000000 0.0000002 0.0000000 1.0000000 0.0000154 0.0000000 0.0000012 0.0000006 
+
+Result of classification: 1 3 5
+
+Test passed!
+```
+
 That's all for this part of the series. Next up will be Part 2: Development Environment, Frameworks, and IDE 
 Installation which will look at setting up your Anaconda Virtual Environment, Jupyter Lab (optional), PyCharm IDE 
-(optional), and installing Keras, TensorFlow, PyTorch, and MxNet.
+(optional), and installing OpenCV, Keras, TensorFlow, PyTorch, and MxNet.

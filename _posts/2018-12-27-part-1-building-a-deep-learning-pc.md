@@ -37,7 +37,7 @@ it and running Windows 10 from within Linux using a raw disk.
 4. Part 4 (Optional): Using GPU on Linux without OpenGL and Xorg
 5. Part 5 (Optional): Windows Raw Disk Virtual Machine
 
-## Hardware and System OS Installation
+## 1.0 Hardware and System OS Installation
 #### Hardware Configurations
 ```
 CPU: Intel Core i9 9900K LGA1151 3.6GHz (5GHz Turbo) 8 Cores, 16 Thread Unlocked 
@@ -45,7 +45,7 @@ Motherboard: Asus ROG Maximus XI Extreme*
 Memory: 32GB DIMM DDR4 3200MHZ
 PSU: Asus ROG Thor 1200W 80+ Platinum
 Hard Drive: 2x Samsung 970 Pro 521GB V-NAND NVMe M.2 SSD**
-Additional Persistent Storage: 6x Samsung 860 Pro 1TB V-NAND SATA SSD in Raid 0 with Intel Rapid Storage***
+Additional Persistent Storage: 3x Samsung 860 Pro 1TB V-NAND SATA SSD in Raid 0 with mdadm
 Onboard GPU: Intel UHD Graphics 630 
 Additional GPU: 2x Asus GeForce RTX 2080 Ti Dual with NVIDIA NVLink
 ```
@@ -54,8 +54,7 @@ much crazy cooling required. You will need some sort of AIO or custom water cool
 
 ** Windows 10 was installed in one SSD to allow easier configurations of BIOS with utilities provided by Asus.
 
-*** There is still some considerations to use Intel Optane Memory Raid however, there are some concerns with PCI-e 
-lanes with adding too many devices in addition to running dual GPU (will update further). 
+~~There is still some considerations to use Intel Optane Memory Raid however, there are some concerns with PCI-e lanes with adding too many devices in addition to running dual GPU (will update further).~~ 
 
 #### System Configurations
 ```
@@ -95,7 +94,7 @@ Ubuntu 18.04.1 install comes prepackaged with kernel 4.15, however, the latest a
 the Ubuntu repository. 
 To install this, we will manually install via `apt`.
 
-## Setting up the Ubuntu 18.04 for Hardware Compatibility
+## 2.0 Setting up the Ubuntu 18.04 for Hardware Compatibility
 At this stage, we want to set up the Ubuntu to ensure all packages required for deep learning and GPU support will be 
 ready. To do this, we will also be installing some additional useful packages.
 
@@ -127,7 +126,7 @@ $ sudo apt update
 $ sudo apt install -y git-lfs
 ```
 
-## Jetbrains Toolbox and IDE
+## 3.0 JetBrains Toolbox and IDE
 One of my favourite IDE to use during development it JetBrain's various development editors - particularly PyCharm and 
 IntelliJ IDEA. To easily install as many of them as possible, Jetbrains provides a 
 [Toolbox application](https://www.jetbrains.com/toolbox/app/) you can use to easily install each individual IDE. To 
@@ -189,12 +188,12 @@ use next time to run the tool.
 
 ![JetBrains Toolbox App](/images/2018-12-27-jetbrains_toolbox.PNG)
 
-## Installing NVIDIA GPU drivers
+## 4.0 Installing NVIDIA GPU drivers
 Some of the deep learning libraries we will be installing later will use the GPU and CUDA to allow better processing of 
 machine learning computations. To ensure they work properly, you must install the correct proprietary drivers for your
  GPU. In my case, the following will work.
 
-### (1)
+### 4.1
 Check that your GPU is visible to the kernel via the PCI-e lanes:
 ```
 $ lspci -nn | grep -i nvidia
@@ -244,7 +243,7 @@ $ sudo apt install -y gcc gcc-6 g++-6 build-essential cmake unzip pkg-config lib
   liblapack-dev gfortran libhdf5-serial-dev python3-dev python3-tk python-imaging-tk ubuntu-restricted-extras
 ```
 
-### (2)
+### 4.2
 Next, Ubuntu comes with a default open-source driver for GPU called 'nouveau'. Allowing this driver to be loaded will 
 interfere with the NVIDIA drivers. To blacklist this during boot up, create the following configuration file in 
 `/etc/modprobe.d/blacklist-nouveau.conf`. 
@@ -274,7 +273,7 @@ $ sudo reboot
 
 [IMPORTANT !!!] After you have rebooted back to Ubuntu, ensure you follow these steps carefully.
 
-### (3) 
+### 4.3
 Before you login to the Ubuntu X Window System, press _Ctl + Alt + F3_ to use the virtual console `tty3`. Login 
 through the TTY subsystem as below:
   ```bash
@@ -284,7 +283,7 @@ through the TTY subsystem as below:
   $
   ```
 
-### (4) 
+### 4.4
 Check that you have blacklisted 'nouveau' properly by running:
   ```bash
   $ lsmod | grep -i nouveau
@@ -292,7 +291,7 @@ Check that you have blacklisted 'nouveau' properly by running:
 
 You should see nothing returned.
 
-### (5)
+### 4.5
 We need to stop the display manager and drop to run level 3 next.
   ```bash
   $ sudo service gdm3 stop
@@ -304,7 +303,7 @@ We need to stop the display manager and drop to run level 3 next.
   ```
   \* Ensure that the `[ - ]` is showing for `gdm3` which means you have stopped the service properly.
 
-### (6) 
+### 4.6
 We are going to use a PPA which will allow us to use the latest NVIDIA proprietary drivers.
   ```bash
   $ sudo add-apt-repository ppa:graphics-drivers/ppa
@@ -322,7 +321,7 @@ Before we install the driver, we will use Ubuntu to find out what is the recomme
   driver   : nvidia-driver-415 - third-party free recommended
   driver   : nvidia-driver-410 - third-party free
   driver   : xserver-xorg-video-nouveau - distro free builtin
-  ```  
+  ```
 * The output above says that `nvidia-driver-415` is the recommended proprietary driver to use so we will install that. 
 * You could also just install the driver using `sudo ubuntu-drivers autoinstall` which would install the recommended 
 driver. 
@@ -361,7 +360,7 @@ $ nvidia-smi
 * Please note I have `Processes` running because my GPU is being used to run the X Window System including the 
 `gnome-shell` and `Xorg`.
 
-## Installing CUDA Toolkit and cuDNN
+## 5.0 Installing CUDA Toolkit and cuDNN
 
 When working with Deep Learning and GPU's, inevitably, you will need a utility framework provided by NVIDIA called 
 [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1804&target_type=runfilelocal) which provides a development environment for creating high performance GPU-accelerated applications.  
@@ -372,21 +371,21 @@ Python libraries such as TensorFlow, Keras, and PyTorch have provided a wrapper 
 
 To install CUDA, you can either go to the thorough [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) or just follow the steps below.
 
-### (1) Downloading CUDA Installation Runfile
-The first step we need to do is download the installation run file from this 
+### 5.1 Downloading CUDA Installation Runfile
+The first step we need to do is download the installation `deb` file from this 
 [site](https://developer.nvidia.com/cuda-downloads). From here, select the appropriate options as per below:
 
 ![NVIDIA CUDA Download page](/images/2018-12-27-cuda_download.png)
 
-Download the file by clicking the _Download (2.0 GB)_ button. Ensure you download it to `/home/<username>/Downloads`.
+Download the file by clicking the _Download (1.6 GB)_ button. Ensure you download it to `/home/user/Downloads`.
 
 We will be using the run file to avoid installing the NVIDIA driver again as part of this process.
 
-### (2) Installing CUDA from the runfile.
+### 5.2 Installing CUDA from the deb.
 
 From here, we will need to logout of `gdm3` again and repeat step (3) from when we installed the nVidia driver.
 
-Press _Ctl + Alt + F3_ to use the virtual console `ttyn2` and login:
+Press _Ctl + Alt + F3_ to use the virtual console `tty3` and login:
   ```bash
   Ubuntu 18.04 SYSTEM-HOSTNAME tty3
   SYSTEM-HOSTNAME login: your-user-login
@@ -399,29 +398,34 @@ Press _Ctl + Alt + F3_ to use the virtual console `ttyn2` and login:
   $ sudo init 3
   ```
 
-Now that we have done this, we need to execute the runfile installation process. These commands will ensure you do 
+Now that we have done this, we need to install the Debian package. These commands will ensure you do 
 not need to follow any prompts. 
 
 ```bash
 $ cd $HOME/Downloads/
-$ sudo ./cuda_10.0.130_410.48_linux.run --silent --toolkit --toolkitpath=/usr/local/cuda-10.0/ --samples
-$ sudo ln -s /usr/local/cuda-10.0 /usr/local/cuda
+$ sudo dpkg -i cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb
+$ sudo apt-key add /var/cuda-repo-10-0-local-10.0.130-410.48/7fa2af80.pub
+$ sudo apt update
+$ sudo apt install cuda-toolkit-10-0
 ```
-* The last line just adds a symbolic link to the CUDA installation path to allow you to install a newer version at a 
-later date.
+* Make sure you do not install the `cuda` package as it will install the NVIDIA driver that will override the driver we installed previously.
 
-The following details the advanced options we used. 
+The following details explain the meta-packages. 
 
-| Action | Options Used | Explanation |
-|--------|--------------|-------------|
-| Silent installation | --silent | Required for any silent installation. Performs an installation with no further user-input and minimal command-line output based on the options provided below. Silent installations are useful for scripting the installation of CUDA. Using this option implies acceptance of the EULA. The following flags can be used to customize the actions taken during installation. At least one of --driver, --uninstall, --toolkit, and --samples must be passed if running with non-root permissions. |
- | | --driver | Install the CUDA Driver |
- | | --toolkit | Install the CUDA Toolkit. |
- | | --toolkitpath=\<path\> | Install the CUDA Toolkit to the <path> directory. If not provided, the default path of `/usr/local/cuda-10.0` is used. |
- | | --samples | Install the CUDA Samples |
- | | --samplespath=\<path\> | Install the CUDA Samples to the <path> directory. If not provided, the default path of `$HOME/NVIDIA_CUDA-10.0_Samples` is used. |
- 
-### (3) Post-installation steps
+| Meta Package              | Purpose                                                      |
+| :------------------------ | :----------------------------------------------------------- |
+| `cuda`                    | Installs all CUDA Toolkit and Driver packages. Handles upgrading to the next version of the cuda package when it's released. |
+| `cuda-10-0`               | Installs all CUDA Toolkit and Driver packages. Remains at version 10.0 until an additional version of CUDA is installed. |
+| `cuda-toolkit-10-0`       | Installs all CUDA Toolkit packages required to develop CUDA applications. Does not include the driver. |
+| `cuda-tools-10-0`         | Installs all CUDA command line and visual tools.             |
+| `cuda-runtime-10-0`       | Installs all CUDA Toolkit packages required to run CUDA applications, as well as the Driver packages. |
+| `cuda-compiler-10-0`      | Installs all CUDA compiler packages.                         |
+| `cuda-libraries-10-0`     | Installs all runtime CUDA Library packages.                  |
+| `cuda-libraries-dev-10-0` | Installs all development CUDA Library packages.              |
+| `cuda-drivers`            | Installs all Driver packages. Handles upgrading to the next version of the Driver packages when they're released. |
+
+### 5.3 Post-installation steps
+
 To ensure the system knows where your CUDA installation is, you will need to add some environment variables to your 
 system. You can do this by adding these to your `$HOME/.bashrc` profile file.
 
@@ -439,11 +443,11 @@ $ source $HOME/.bashrc
 * I added the CUDA Samples variable also so you can easily run some of the samples later. After testing, you can 
 remove this line.
 
-### (4) Testing the CUDA installation
+### 5.4 Testing the CUDA installation
 
 Now that we have installed and setup environment variables for CUDA, we will test the installation by running some of
  the samples that were installed with CUDA. Follow the following steps.
- 
+
 ```bash
 $ nvcc -V
 
@@ -505,16 +509,19 @@ Result = PASS
 If you have correctly installed CUDA and setup the environment variables, running the above will give you a similar 
 output. 
 
-### (5) Installing cuDNN
+### 5.5 Installing cuDNN
 
 The NVIDIA CUDA Depp Neural Network library (cuDNN) is a GPU-accelerated library that provides implementations of 
 standard routines such as forward and backward convolution, pooling, normalization, and activation layers. It is 
 often implemented as part of many deep learning frameworks such as Keras, MxNet, TensorFlow, and PyTorch. 
 
 To download cuDNN, you must sign in or create an NVIDIA Developer account. Then go to this 
-[link](https://developer.nvidia.com/rdp/cudnn-download) and select _Download cuDNN v7.45.2 (Dec 14, 2018), for CUDA 
-10.0_ and then _cuDNN Library for Linux_. Also, make sure you download _cuDNN Code Samples and User Guide for 
-Ubuntu18.04 (Deb)_ Download this to your `$HOME/Downloads/` directory.
+[link](https://developer.nvidia.com/rdp/cudnn-download) and select _Download cuDNN v7.4.2 (Dec 14, 2018), for CUDA 
+10.0_. Download the following Debian package files to your `$HOME/Downloads$` directory:
+
+* *cuDNN Runtime Library for Ubuntu18.04 (Deb)*
+* *cuDNN Developer Library for Ubuntu18.04 (Deb)*
+* *cuDNN Code Samples and User Guide for Ubuntu18.04 (Deb)*
 
 ![cuDNN Downloads Page](/images/2018-12-27-cudnn_download.png)
 
@@ -523,39 +530,19 @@ The installation guide provided by NVIDIA can also be found
 
 ```bash
 $ cd $HOME/Downloads/
-$ tar -xvf cudnn-10.0-linux-x64-v7.4.2.24.tgz
+$ sudo dpkg -i libcudnn7_7.4.1.5-1+cuda10.0_amd64.deb
+$ sudo dpkg -i libcudnn7-dev_7.4.1.5-1+cuda10.0_amd64.deb
+$ sudo dpkg -i libcudnn7-doc_7.4.1.5-1+cuda10.0_amd64.deb
 ```
 
-This compressed directory includes the following important headers which you can see from the following output.
-
-```bash
-$ ls cuda/lib64/
-
-libcudnn.so  libcudnn.so.7  libcudnn.so.7.4.2  libcudnn_static.a
-
-$ ls cuda/include/
-
-cudnn.h
-```
-
-To ensure the library works, all you need to do is copy these files to your CUDA directory.
-
-```bash
-$ sudo cp cuda/include/cudnn.h /usr/local/cuda/include/
-$ sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64/
-$ sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
-```
-* Ensure that `usr/local/cuda` is symlinked correctly to your CUDA installation directory which was originally 
-installed at `/usr/local/cuda-10.0`.
-
-### Testing cuDNN Samples
+### 5.6 Testing cuDNN Samples
 At this point, you should have the cuDNN library installed. To test if the library works properly, we will use the 
 code samples provided in the `deb` file, extract it, compile it, and then run it. You should be currently in your 
 `$HOME/Downloads` directory if that's where you downloaded the samples.
 
 ```bash
-$ dpkg -x libcudnn7-doc_7.4.1.5-1+cuda10.0_amd64.deb $HOME/Downloads/
-$ mv /usr/src/cudnn_samples_v7 $HOME/Downloads/ && rm -rf src/
+$ cp -r /usr/src/cudnn_samples_v7/ $HOME
+$ cd $HOME/cudnn_samples_v7/mnistCUDNN
 $ cd cudnn_samples_v7/mnistCUDNN
 $ make clean && make
 $ ./mnistCUDNN

@@ -63,8 +63,54 @@ Download or move to this `deep_learning_env` directory and then do the following
 
 ```bash
 $ mkdir $HOME/deep_learning_env & cd deep_learning_env
-$ 
+$ tar -xzf parallel_studio_xe_2018_update4_cluster_edition.tgz
+$ cd parallel_studio_xe_2018_update4_cluster_edition/
+$ sudo ./install_GUI.sh
 ```
+
+The GUI installation process will begin. Firstly accept the license agreement and decent if you want to join the Intel Software Improvement Program. After this you will enter your serial number that you received when you registered and downloaded the Intel Parallel Studio XE 2018 Update 4 Cluster Edition for Linux package. 
+
+After you have completed these stages, you will get to a screen like this. Ensure you select __Customize…__
+
+![Intel MKL 1](/images/2019-02-21-intel-mkl-1.png)
+
+From here, you will install it. You can safely leave it as default to install in `/opt/intel`.
+
+![Intel MKL 2](/images/2019-02-21-intel-mkl-2.png)
+
+Finally, here is where you select the packages you will need. 
+
+![Intel MKL 3](/images/2019-02-21-intel-mkl-3.png)
+
+I generally left it as it is and installed the following (note: I have marked the important ones as `**`. You may not need to install the others):
+
+```
+Intel VTune Amplifier 2018 Update 4 **
+Intel Inspector 2018 Update 4
+Intel Advisor 2018 Update 4
+Intel C++ Compiler 18.0 Update 5 **
+Intel Fortran Compuler 18.0 Update 5 **
+Intel Math Kernel Library 2018 Update 4 for C/C++ **
+Intel Math Kernel Library 2018 Update 4 for Fortran **
+Intel Integrated Performance Primitives 2018 Update 4 **
+Intel Threading Building Blocks 2018 Update 6
+Intel Data Analytics Acceleration Library 2018 Update 3
+Intel MPI Library 2018 Update 4
+GNU GDB 7.12
+```
+
+Once that has finished installing, you will need to set the variables using a script provided by the installation. 
+
+```bash
+$ source /opt/intel/bin/compilervars.sh -arch intel64 -platform linux
+$ echo $LD_LIBRARY_PATH 
+/opt/intel/compilers_and_libraries_2018.5.274/linux/compiler/lib/intel64:/opt/intel/compilers_and_libraries_2018.5.274/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.5.274/linux/mpi/intel64/lib:/opt/intel/compilers_and_libraries_2018.5.274/linux/mpi/mic/lib:/opt/intel/compilers_and_libraries_2018.5.274/linux/ipp/lib/intel64:/opt/intel/compilers_and_libraries_2018.5.274/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.5.274/linux/tbb/lib/intel64/gcc4.7:/opt/intel/compilers_and_libraries_2018.5.274/linux/tbb/lib/intel64/gcc4.7:/opt/intel/debugger_2018/libipt/intel64/lib:/opt/intel/compilers_and_libraries_2018.5.274/linux/daal/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.5.274/linux/daal/../tbb/lib/intel64_lin/gcc4.4:/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64:/opt/intel/compilers_and_libraries/linux/lib/intel64:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:
+
+$ echo $CPATH 
+/opt/intel/compilers_and_libraries_2018.5.274/linux/ipp/include:/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/include:/opt/intel/compilers_and_libraries_2018.5.274/linux/pstl/include:/opt/intel/compilers_and_libraries_2018.5.274/linux/tbb/include:/opt/intel/compilers_and_libraries_2018.5.274/linux/tbb/include:/opt/intel/compilers_and_libraries_2018.5.274/linux/daal/include
+```
+
+If you do not see the above in your `LD_LIBRARY_PATH` then there is a major issue and you may need to install again. Please note yours may be fewer in output because you may not have installed as many packages.
 
 ### Using the Intel Distribution for Python
 
@@ -242,34 +288,60 @@ Finally, we are going to build our `numpy` installation:
 $ python3 setup.py config --compiler=intelem build_clib --compiler=intelem build_ext --compiler=intelem install --user
 ```
 
+To test if you have installed it correctly linked with Intel MKL, use the following:
+
+```bash
+$ cd ~/
+$ python3 -c "import numpy as np; np.__config__.show()"
+blas_mkl_info:
+    libraries = ['mkl_rt', 'pthread']
+    library_dirs = ['/opt/intel/compilers_and_libraries_2018/linux/mkl/lib/intel64']
+    define_macros = [('SCIPY_MKL_H', None), ('HAVE_CBLAS', None)]
+    include_dirs = ['/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/include', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib', '/opt/intel/compilers_and_libraries_2018/linux/mkl/include']
+blas_opt_info:
+    libraries = ['mkl_rt', 'pthread']
+    library_dirs = ['/opt/intel/compilers_and_libraries_2018/linux/mkl/lib/intel64']
+    define_macros = [('SCIPY_MKL_H', None), ('HAVE_CBLAS', None)]
+    include_dirs = ['/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/include', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib', '/opt/intel/compilers_and_libraries_2018/linux/mkl/include']
+lapack_mkl_info:
+    libraries = ['mkl_rt', 'pthread']
+    library_dirs = ['/opt/intel/compilers_and_libraries_2018/linux/mkl/lib/intel64']
+    define_macros = [('SCIPY_MKL_H', None), ('HAVE_CBLAS', None)]
+    include_dirs = ['/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/include', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib', '/opt/intel/compilers_and_libraries_2018/linux/mkl/include']
+lapack_opt_info:
+    libraries = ['mkl_rt', 'pthread']
+    library_dirs = ['/opt/intel/compilers_and_libraries_2018/linux/mkl/lib/intel64']
+    define_macros = [('SCIPY_MKL_H', None), ('HAVE_CBLAS', None)]
+    include_dirs = ['/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/include', '/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib', '/opt/intel/compilers_and_libraries_2018/linux/mkl/include']
+```
+
+
+
 ### Scipy
 
 The installation for `scipy` is a little simpler as we are not required to fix any issues. However, if you get errors during this process, it is likely you did not compile `numpy` properly. 
 
 ```bash
-$ cd scipy
-$ cp site.cfg.example site.cfg
-$ nanoe site.cfg
+$ cd $HOME/deep_learning_env/scipy
+$ python3 setup.py config --compiler=intelem --fcompiler=intelem build_clib --compiler=intelem --fcompiler=intelem build_ext --compiler=intelem --fcompiler=intelem install --user
 ```
 
-We need to make the following changes by uncommenting and fixing the values for this section: 
-
-```
-# MKL
-#----
-# MKL is Intel's very optimized yet proprietary implementation of BLAS and
-# Lapack.
-# For recent (9.0.21, for example) mkl, you need to change the names of the
-# lapack library. Assuming you installed the mkl in /opt, for a 32 bits cpu:
-[mkl]
-library_dirs = /opt/intel/mkl/9.1.023/lib/32/
-lapack_libs = mkl_lapack
-```
-
-Finally, let’s install `scipy`:
+Let’s just do a quick test.
 
 ```bash
-$ python3 setup.py config --compiler=intelem --fcompiler=intelem build_clib --compiler=intelem --fcompiler=intelem build_ext --compiler=intelem --fcompiler=intelem install --user
+$ cd ~/
+# pip3 install pytest
+$ python3
+Python 3.6.7 (default, Oct 22 2018, 11:32:17) 
+[GCC 8.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import scipy as sp
+>>> sp.test(verbose=3)
+================= test session starts ===============================
+platform linux -- Python 3.6.7, pytest-4.3.0, py-1.7.0, pluggy-0.8.1 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/codeninja/deep_learning_env/scipy, inifile: pytest.ini
+collected 16700 items / 1223 deselected / 15477 selected
 ```
 
 
@@ -354,6 +426,57 @@ $ ../xcmake.sh
 If you see the following then you are set to go:
 
 ```bash
+--   Parallel framework:            pthreads
+-- 
+--   Trace:                         YES (with Intel ITT)
+-- 
+--   Other third-party libraries:
+--     Intel IPP:                   2018.0.4 [2018.0.4]
+--            at:                   /opt/intel/compilers_and_libraries_2018/linux/ipp
+--        linked:                   static
+--     Intel IPP IW:                sources (2019.0.0)
+--               at:                /home/codeninja/deep_learning_env/ocv_install/build/3rdparty/ippicv/ippicv_lnx/iw/
+--     Lapack:                      YES (/opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_intel_lp64.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_sequential.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_core.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_intel_lp64.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_sequential.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_core.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_intel_lp64.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_sequential.so /opt/intel/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/libmkl_core.so -lpthread -lm -ldl)
+--     Eigen:                       YES (ver 3.3.4)
+--     Custom HAL:                  NO
+--     Protobuf:                    /usr/local/lib/libprotobuf.so (3.6.1)
+-- 
+--   NVIDIA CUDA:                   YES (ver 10.0, CUFFT CUBLAS NVCUVID FAST_MATH)
+--     NVIDIA GPU arch:             30 35 37 50 52 60 61 70 75
+--     NVIDIA PTX archs:
+-- 
+--   OpenCL:                        YES (no extra features)
+--     Include path:                /home/codeninja/deep_learning_env/ocv_install/opencv/3rdparty/include/opencl/1.2
+--     Link libraries:              Dynamic load
+-- 
+--   Python 3:
+--     Interpreter:                 /usr/bin/python3.6 (ver 3.6.7)
+--     Libraries:                   /usr/lib/x86_64-linux-gnu/libpython3.6m.so (ver 3.6.7)
+--     numpy:                       /home/codeninja/.local/lib/python3.6/site-packages/numpy-1.16.1-py3.6-linux-x86_64.egg/numpy/core/include (ver 1.16.1)
+--     install path:                lib/python3.6/dist-packages/cv2/python-3.6
+-- 
+--   Python (for build):            /usr/bin/python2.7
+--     Pylint:                      /usr/bin/pylint (ver: 1.8.3, checks: 168)
+--     Flake8:                      /usr/bin/flake8 (ver: 3.5.0)
+-- 
+--   Java:                          
+--     ant:                         NO
+--     JNI:                         /usr/lib/jvm/default-java/include /usr/lib/jvm/default-java/include/linux /usr/lib/jvm/default-java/include
+--     Java wrappers:               NO
+--     Java tests:                  NO
+-- 
+--   Install to:                    /usr/local
+-- -----------------------------------------------------------------
+-- 
+-- Configuring done
+```
 
+Once that is all good, let’s go ahead and do the install:
+
+```bash
+$ make -j$(nproc) && sudo make install
+$ sudo ldconfig
+$ pkg-config --modversion opencv
+4.0.1
 ```
 

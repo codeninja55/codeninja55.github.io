@@ -147,33 +147,6 @@ unset LD_LIBRARY_PATH
 This will properly set the environment variables when you activate your Conda virtual environment. It will also unset
  them so they do not mess with your local system.
 
-### (Optional) Install Intel Math Kernel Libraries
-
-The [Intel Math Kernel Library (Intel MKL)](https://software.intel.com/en-us/mkl) is a library that optimises code for BLAS (Basic Linear Algebra Subsystems) APIs. To install it it to be used for other Deep Learning frameworks, we must download and install it via GUI. Go [here](https://software.intel.com/en-us/performance-libraries) to download the _Intel Math Kernel Library for Linux_ package to `$HOME/Downloads`.
-
-```bash
-$ cd $HOME/Downloads
-$ tar -xzf l_mkl_2019.2.187.tgz
-$ cd l_mkl_2019.2.187/
-$ ./install_GUI.sh
-$ sudo mv $HOME/intel /opt/
-```
-
-![Intel MKL 1](/images/2019-02-09_intel_mkl-1.png)
-
-![Intel MKL 2](/images/2019-02-09_intel_mkl-2.png)
-
-![Intel MKL 2](/images/2019-02-09_intel_mkl-3.png)
-
-From here, we need to add some variables to `$HOME/.bashrc`:
-
-```bash
-$ echo '' >> $HOME/.bashrc
-$ echo '##### INTEL MKL #####' >> $HOME/.bashrc
-$ echo 'export INTEL_COMPILERS_AND_LIBS=/opt/intel/compilers_and_libraries/linux' >> $HOME/.bashrc
-$ source $INTEL_COMPILERS_AND_LIBS/mkl/bin/mklvars.sh intel64
-```
-
 ### Creating the deep learning environment
 
 To create an environment with Anaconda, you will generally use the `conda` command in a terminal. To install packages 
@@ -231,7 +204,10 @@ added to this environment.
 * The asterisk `*` from the `conda env list` output is the currently activated environment. 
 * From this point onwards, all commands marked `(deep_learning_cv) $ ` will mean the command was run with the activated environment.
 
+
+
 ### Installing OpenCV from Source
+
 [OpenCV (Open Source Computer Vision)](https://opencv.org/) is a library that is very popular these days when doing Deep Learning with 
 Computer Vision or any image processing. It has a C++ and Python interface that we can make use of during development. 
 
@@ -260,7 +236,17 @@ $ sudo apt-get install ./libjasper1_1.900.1-debian1-2.4ubuntu1.2_amd64.deb \
   ./libjasper-dev_1.900.1-debian1-2.4ubuntu1.2_amd64.deb
 ```
 
-Finally, another issue noted in the following [#9953](https://github.com/opencv/opencv/issues/9953) and then solved in 
+Lets prepare our installation directory:
+
+```bash
+$ mkdir opencv_install && cd opencv_install
+$ git clone https://github.com/opencv/opencv.git
+$ git clone https://github.com/opencv/opencv_contrib.git
+$ cd opencv; git checkout 3.4.5
+$ cd ../opencv_contrib; git checkout 3.4.5
+```
+
+An issue noted in the following [#9953](https://github.com/opencv/opencv/issues/9953) and then solved in 
 [#12957](https://github.com/opencv/opencv/issues/12957) to get OpenBLAS to work in Ubuntu 18.04. 
 
 Install the required dependencies:
@@ -318,11 +304,6 @@ Finally, we can download OpenCV from their Github repository and compile the rel
 going to install version `3.4.5`.
 
 ```bash
-$ mkdir opencv_install && cd opencv_install
-$ git clone https://github.com/opencv/opencv.git
-$ git clone https://github.com/opencv/opencv_contrib.git
-$ cd opencv; git checkout 3.4.5
-$ cd ../opencv_contrib; git checkout 3.4.5
 $ cd .. && nano xcmake.sh 
 ```
 
@@ -540,7 +521,7 @@ $ sudo ldconfig
 
 ```bash
 $ source activate deep_learning_cv
-$ pip install -U pip six numpy wheel mock
+$ pip install -U pip six wheel mock
 $ pip install -U keras_applications==1.0.6 --no-deps
 $ pip install -U keras_preprocessing==1.0.5 --no-deps
 ```
@@ -702,6 +683,14 @@ INFO: Build completed successfully, 18989 total actions
 * add "--config=mkl" if you want Intel MKL support for newer intel cpu for faster training on cpu
 * add "--config=monolithic" if you want static monolithic build (try this if build failed)
 * add "--local_resources 2048,.5,1.0" if your PC has low ram causing Segmentation fault or other related errors
+
+#### (Optional) Build Tensorflow with Intel MKL with AVX, AVX2, and AVX512
+
+```bash
+$ bazel build --config=opt --config=cuda --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er //tensorflow/tools/pip_package:build_pip_package
+```
+
+
 
 If everything worked fine, it should look like the output above. Finally, we need to make the `pip` package and then install it to our Anaconda virtual env. 
 
